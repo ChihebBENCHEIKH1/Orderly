@@ -1,0 +1,5 @@
+  application:
+    name: warehouse-service
+  kafka:
+    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
