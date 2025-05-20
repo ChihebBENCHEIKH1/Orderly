@@ -1,6 +1,6 @@
 package io.chiheb.warehouseservice.warehouse;
 
-import io.chiheb.warehouseservice.warehouse.domain.StockLine;
+import io.chiheb.warehouseservice.warehouse.clients.OrderServiceClient;
 import io.chiheb.warehouseservice.warehouse.exceptions.ItemNotFound;
 import io.chiheb.warehouseservice.warehouse.exceptions.ItemNotInStock;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +11,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class WarehouseService {
   private final StockLineRepository stockLineRepository;
+  private final OrderServiceClient orderServiceClient;
 
   public Mono<Void> verifyIsInStock(String itemId, int amountRequired) {
     return stockLineRepository.findById(itemId)
@@ -22,5 +23,13 @@ public class WarehouseService {
     return stockLineRepository.findById(itemId)
         .map(sl -> sl.reserve(amountRequired))
         .flatMap(stockLineRepository::save);
+  }
+
+  public void declineStockReservation(String orderId, String message) {
+    orderServiceClient.sendStockReservationFailure(orderId, message);
+  }
+
+  public void confirmStockReservation(String orderId) {
+    orderServiceClient.sendStockReservationSuccess(orderId);
   }
 }

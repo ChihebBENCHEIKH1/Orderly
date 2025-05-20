@@ -1,11 +1,11 @@
-package io.chiheb.warehouseservice.warehouse.listeners.events;
+package io.kirill.warehouseservice.warehouse.listeners.events;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
 @Value
 @RequiredArgsConstructor
-public class StockVerificationEvent {
+public class StockReservationEvent {
   private final String oderId;
   private final List<OrderLine> orderLines;
 }
