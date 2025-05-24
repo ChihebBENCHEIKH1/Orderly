@@ -1,7 +1,13 @@
 package io.chiheb.orderservice.order;
 
-import io.chiheb.orderservice.order.clients.WarehouseClient;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import io.chiheb.orderservice.order.clients.WarehouseServiceClient;
 import io.chiheb.orderservice.order.domain.OrderBuilder;
+import io.chiheb.orderservice.order.domain.OrderStatus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,9 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
 
@@ -20,10 +23,12 @@ class OrderServiceTest {
   OrderRepository orderRepository;
 
   @Mock
-  WarehouseClient warehouseClient;
+  WarehouseServiceClient warehouseServiceClient;
 
   @InjectMocks
   OrderService orderService;
+
+  String orderId = "order-1";
 
   @Test
   void create() {
@@ -33,12 +38,11 @@ class OrderServiceTest {
     var savedOrder = orderService.create(newOrder);
 
     StepVerifier
-      .create(savedOrder)
-      .expectNextMatches(order -> order.getId().equals(newOrder.getId()) && order.getCustomerId().equals(newOrder.getCustomerId()))
-      .verifyComplete();
+        .create(savedOrder)
+        .expectNextMatches(order -> order.getId().equals(newOrder.getId()) && order.getCustomerId().equals(newOrder.getCustomerId()))
+        .verifyComplete();
 
     verify(orderRepository).save(newOrder);
-    verify(warehouseClient).reserveStock(newOrder);
   }
 
   @Test
@@ -49,10 +53,35 @@ class OrderServiceTest {
     var savedOrder = orderService.create(newOrder);
 
     StepVerifier
-      .create(savedOrder)
-      .verifyError();
+        .create(savedOrder)
+        .verifyError();
 
     verify(orderRepository).save(newOrder);
-    verify(warehouseClient, never()).reserveStock(any());
+  }
+
+  @Test
+  void reserveStock() {
+    var newOrder = OrderBuilder.get().build();
+
+    orderService.reserveStock(newOrder);
+
+    verify(warehouseServiceClient).sendStockReservationEvent(newOrder);
+  }
+
+  @Test
+  void updateStatus() {
+    var order = OrderBuilder.get().id(orderId).status(OrderStatus.INITIATED).build();
+
+    when(orderRepository.findById(orderId)).thenReturn(Mono.just(order));
+
+    var updatedOrder = orderService.updateStatus(orderId, OrderStatus.STOCK_RESERVED);
+
+    StepVerifier
+        .create(updatedOrder)
+        .expectNextMatches(o -> o.getId().equals(orderId) && o.getStatus() == OrderStatus.STOCK_RESERVED)
+        .verifyComplete();
+
+    verify(orderRepository).findById(orderId);
+    verify(orderRepository).save(order.withStatus(OrderStatus.STOCK_RESERVED));
   }
 }
