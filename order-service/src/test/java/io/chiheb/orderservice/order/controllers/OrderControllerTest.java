@@ -28,15 +28,15 @@ import reactor.core.publisher.Mono;
 class OrderControllerTest {
 
   @Autowired
-  WebTestClient client;
+  private WebTestClient client;
 
   @MockBean
-  OrderService orderService;
+  private OrderService orderService;
 
   @Captor
-  ArgumentCaptor<Order> orderArgumentCaptor;
+  private ArgumentCaptor<Order> orderArgumentCaptor;
 
-  Order testOrder = OrderBuilder.get().build();
+  private Order testOrder = OrderBuilder.get().build();
 
   @Test
   void create() {

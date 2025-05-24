@@ -8,8 +8,8 @@ import lombok.Value;
 @Value
 @RequiredArgsConstructor
 public class OrderLine {
-  @NotEmpty
   private final String itemId;
-  @Min(1)
   private final Integer amount;
+  private final Integer quantity;
+
 }

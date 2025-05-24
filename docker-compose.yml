@@ -45,6 +45,21 @@ services:
       MONGO_HOST: mongo-warehouse
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
+  mongo-catalogue:
+    image: bitnami/mongodb:latest
+    environment:
+      MONGODB_USERNAME: dbuser
+      MONGODB_PASSWORD: dbpassword
+      MONGODB_DATABASE: catalogue
+  catalogue-service:
+    build:
+      context: ./catalogue-service
+      dockerfile: Dockerfile.dev
+    links:
+      - mongo-catalogue
+    environment:
+      MONGO_HOST: mongo-catalogue
+
   mongo-finance:
     image: bitnami/mongodb:latest
     environment:
@@ -61,18 +76,4 @@ services:
     environment:
       MONGO_HOST: mongo-finance
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-
-  mongo-catalogue:
-    image: bitnami/mongodb:latest
-    environment:
-      MONGODB_USERNAME: dbuser
-      MONGODB_PASSWORD: dbpassword
-      MONGODB_DATABASE: catalogue
-  catalogue-service:
-    build:
-      context: ./catalogue-service
-      dockerfile: Dockerfile.dev
-    links:
-      - mongo-catalogue
-    environment:
-      MONGO_HOST: mongo-catalogue
+      CATALOGUE_SERVICE_URI: catalogue-service
