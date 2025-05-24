@@ -16,27 +16,27 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.kafka.core.KafkaTemplate;
 
 @ExtendWith(MockitoExtension.class)
-class WarehouseClientTest {
+class WarehouseServiceClientTest {
 
   @Mock
   KafkaTemplate<String, Object> kafkaTemplate;
 
   @InjectMocks
-  WarehouseClient warehouseClient;
+  WarehouseServiceClient warehouseServiceClient;
 
   @Captor
   ArgumentCaptor<StockReservationEvent> stockVerificationEventArgumentCaptor;
 
   @Test
-  void reserveStock() {
+  void sendStockReservationEvent() {
     var order = OrderBuilder.get().id("id1").build();
 
-    warehouseClient.reserveStock(order);
+    warehouseServiceClient.sendStockReservationEvent(order);
 
     verify(kafkaTemplate).send(eq("warehouse.stock.reserve"), eq("id1-stock-reservation"),  stockVerificationEventArgumentCaptor.capture());
 
     var sentEvent = stockVerificationEventArgumentCaptor.getValue();
-    assertThat(sentEvent.getOderId()).isEqualTo(order.getId());
+    assertThat(sentEvent.getOrderId()).isEqualTo(order.getId());
     assertThat(sentEvent.getOrderLines()).isEqualTo(order.getOrderLines());
   }
 }
