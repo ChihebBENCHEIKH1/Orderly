@@ -1,11 +1,6 @@
 
 package io.chiheb.warehouseservice.warehouse;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.verify;
-
 import io.chiheb.warehouseservice.warehouse.clients.OrderServiceClient;
 import io.chiheb.warehouseservice.warehouse.domain.OrderLine;
 import io.chiheb.warehouseservice.warehouse.domain.StockLine;
@@ -16,6 +11,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class WarehouseServiceTest {
@@ -74,7 +74,6 @@ class WarehouseServiceTest {
   @Test
   void reserveStock() {
     var orderLine = new OrderLine(itemId, 2);
-
     var stockLine = new StockLine(itemId, 3, 1);
 
     doAnswer(invocation -> Mono.just(invocation.getArgument(0))).when(stockLineRepository).save(any());
@@ -84,6 +83,23 @@ class WarehouseServiceTest {
         .create(warehouseService.reserveStock(orderLine))
         .expectNextMatches(sl -> sl.getItemId().equals(itemId) && sl.getAmountAvailable().equals(1) && sl.getAmountReserved().equals(3))
         .verifyComplete();
+
+    verify(stockLineRepository).findById(itemId);
+    verify(stockLineRepository).save(any());
+  }
+
+  @Test
+  void clearStockReservation() {
+    var orderLine = new OrderLine(itemId, 2);
+    var stockLine = new StockLine(itemId, 1, 3);
+
+    doAnswer(invocation -> Mono.just(invocation.getArgument(0))).when(stockLineRepository).save(any());
+    doAnswer(invocation -> Mono.just(stockLine)).when(stockLineRepository).findById(anyString());
+
+    StepVerifier
+      .create(warehouseService.clearStockReservation(orderLine))
+      .expectNextMatches(sl -> sl.getItemId().equals(itemId) && sl.getAmountAvailable().equals(3) && sl.getAmountReserved().equals(1))
+      .verifyComplete();
 
     verify(stockLineRepository).findById(itemId);
     verify(stockLineRepository).save(any());
