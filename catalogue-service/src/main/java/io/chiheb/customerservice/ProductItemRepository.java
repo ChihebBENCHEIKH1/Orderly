@@ -1,4 +1,4 @@
-package io.chiheb.catalogueservice.product;
+package io.chiheb.customerservice.customer.customer;;
 
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 
