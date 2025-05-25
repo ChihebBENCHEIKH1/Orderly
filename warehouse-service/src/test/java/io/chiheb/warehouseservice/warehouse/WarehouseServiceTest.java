@@ -4,6 +4,8 @@ package io.chiheb.warehouseservice.warehouse;
 import io.chiheb.warehouseservice.warehouse.clients.OrderServiceClient;
 import io.chiheb.warehouseservice.warehouse.domain.OrderLine;
 import io.chiheb.warehouseservice.warehouse.domain.StockLine;
+import io.chiheb.warehouseservice.warehouse.repositories.StockLineRepository;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
