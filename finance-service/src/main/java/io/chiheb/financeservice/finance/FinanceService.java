@@ -2,7 +2,7 @@ package io.chiheb.financeservice.finance;
 
 import io.chiheb.financeservice.finance.clients.CatalogueServiceClient;
 import io.chiheb.financeservice.finance.clients.OrderServiceClient;
-import io.chiheb.financeservice.finance.domain.OrderDetails;
+import io.chiheb.financeservice.finance.domain.Order;
 import io.chiheb.financeservice.finance.domain.OrderLine;
 import io.chiheb.financeservice.finance.domain.Transaction;
 import io.chiheb.financeservice.finance.domain.TransactionLine;
@@ -18,7 +18,7 @@ public class FinanceService {
   private final TransactionRepository transactionRepository;
   private final OrderServiceClient orderServiceClient;
 
-  public Mono<Transaction> processPayment(OrderDetails order) {
+  public Mono<Transaction> processPayment(Order order) {
     /* Heavy payment processing logic */
     return Flux.fromIterable(order.getOrderLines())
         .flatMap(this::createTransactionLine)

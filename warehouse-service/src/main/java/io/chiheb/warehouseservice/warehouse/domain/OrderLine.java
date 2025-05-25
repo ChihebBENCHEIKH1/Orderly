@@ -1,11 +1,11 @@
-package io.chiheb.warehouseservice.warehouse.listeners.events;
+package io.chiheb.warehouseservice.warehouse.domain;
 
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
 @Value
 @RequiredArgsConstructor
-class OrderLine {
+public class OrderLine {
   private final String itemId;
   private final Integer quantity;
 }
