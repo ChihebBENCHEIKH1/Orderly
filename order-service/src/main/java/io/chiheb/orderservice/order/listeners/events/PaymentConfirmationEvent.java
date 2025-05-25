@@ -1,4 +1,4 @@
-package io.chiheb.financeservice.finance.clients.events;
+package io.chiheb.orderservice.order.listeners.events;
 
 import lombok.RequiredArgsConstructor;
 import lombok.Value;

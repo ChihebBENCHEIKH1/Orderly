@@ -1,10 +1,11 @@
-package io.chiheb.financeservice.finance.clients.events;
+package io.chiheb.orderservice.order.listeners.events;
 
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 
 @Value
 @RequiredArgsConstructor
-public class PaymentConfirmationEvent {
+public class PaymentRejectionEvent {
   private final String orderId;
+  private final String message;
 }
