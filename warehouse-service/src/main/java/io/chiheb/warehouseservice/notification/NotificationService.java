@@ -1,7 +1,7 @@
-package io.chiheb.financeservice.notification;
+package io.chiheb.warehouseservice.notification;
 
-import io.chiheb.financeservice.finance.domain.Invoice;
-import io.chiheb.financeservice.notification.clients.NotificationServiceClient;
+import io.chiheb.warehouseservice.notification.clients.NotificationServiceClient;
+import io.chiheb.warehouseservice.warehouse.domain.Shipment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +14,7 @@ public class NotificationService {
     notificationServiceClient.sendOrderCancellationEvent(customerId, orderId, message);
   }
 
-  public void informCustomerAboutPayment(Invoice invoice) {
-    notificationServiceClient.sendPaymentSuccessEvent(invoice);
+  public void informCustomerAboutShipment(Shipment shipment) {
+    notificationServiceClient.sendShipmentPreparationEvent(shipment);
   }
 }

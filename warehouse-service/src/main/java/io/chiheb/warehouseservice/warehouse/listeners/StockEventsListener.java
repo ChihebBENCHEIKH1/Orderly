@@ -1,5 +1,6 @@
 package io.chiheb.warehouseservice.warehouse.listeners;
 
+import io.chiheb.warehouseservice.notification.NotificationService;
 import io.chiheb.warehouseservice.warehouse.WarehouseService;
 import io.chiheb.warehouseservice.warehouse.domain.Order;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import static io.chiheb.warehouseservice.common.configs.KafkaConfig.WAREHOUSE_ST
 @RequiredArgsConstructor
 public class StockEventsListener {
   private final WarehouseService warehouseService;
+  private final NotificationService notificationService;
 
   @KafkaListener(topics = WAREHOUSE_STOCK_RESERVE_TOPIC)
   public void reserveStock(@Payload Object event) {
@@ -28,6 +30,7 @@ public class StockEventsListener {
         .doOnNext(warehouseService::reserveStock)
         .onErrorStop()
         .doOnError(error -> warehouseService.rejectStockReservation(order.getId(), error.getMessage()))
+        .doOnError(error -> notificationService.informCustomerAboutCancellation(order.getCustomerId(), order.getId(), error.getMessage()))
         .doOnComplete(() -> warehouseService.confirmStockReservation(order.getId()))
         .subscribe();
   }
